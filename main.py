@@ -32,7 +32,6 @@ class GetStocks:
             return driver
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            print(f"ERROR: {e}. LINE: {exc_tb.tb_lineno}")
             logging.error(f"ERROR: {e}. LINE: {exc_tb.tb_lineno}")
             return None
     
@@ -82,11 +81,8 @@ class GetStocks:
                 df = df.iloc[:, :3]
                 df_final = pd.concat([df_final, df])
 
-        df_final.to_csv(f'stocks_{self.region}.csv')
+        df_final.to_csv(f'files/stocks_{self.region}.csv')
 
         logging.info('File exported!')
 
         self.driver.quit()
-
-if __name__ == '__main__':
-    GetStocks('Czechia').main()
