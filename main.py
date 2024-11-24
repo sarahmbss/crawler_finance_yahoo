@@ -34,6 +34,16 @@ class GetStocks:
             _, _, exc_tb = sys.exc_info()
             logging.error(f"ERROR: {e}. LINE: {exc_tb.tb_lineno}")
             return None
+
+    def get_stocks_into_dataframe(self):
+        '''
+            Description:
+                Extract the available stocks from the website and converts it to a dataframe
+        '''
+        table = self.driver.find_element("xpath","//*[@id='screener-results']/div[1]/div[2]/div[1]/table").get_attribute("outerHTML")
+        df = pd.read_html(table)[0]
+        df = df.iloc[:, :3]
+        return df
     
     def main(self):
         '''
@@ -63,10 +73,7 @@ class GetStocks:
         time.sleep(5)
 
         logging.info('Getting the stocks...')
-
-        table = self.driver.find_element("xpath","//*[@id='screener-results']/div[1]/div[2]/div[1]/table").get_attribute("outerHTML")
-        df_final = pd.read_html(table)[0]
-        df_final = df_final.iloc[:, :3]
+        df_final = self.get_stocks_into_dataframe()
 
         while True:
             try:
@@ -76,9 +83,7 @@ class GetStocks:
                 break
             else:
                 time.sleep(2)
-                table = self.driver.find_element("xpath","//*[@id='screener-results']/div[1]/div[2]/div[1]/table").get_attribute("outerHTML")
-                df = pd.read_html(table)[0]
-                df = df.iloc[:, :3]
+                df = self.get_stocks_into_dataframe()
                 df_final = pd.concat([df_final, df])
 
         df_final.to_csv(f'files/stocks_{self.region}.csv')
